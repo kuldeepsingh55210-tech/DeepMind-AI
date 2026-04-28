@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from anthropic import Anthropic
+from groq import Groq
 from language_detector import detect_language
 from sip import calculate_sip
 from tax_advisor import calculate_tax_savings
@@ -17,7 +17,7 @@ from investment_advisor import get_investment_advice
 from study_engine import get_study_prompt
 
 # Anthropic API client
-client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 # Step 3 — Create the FastAPI app
 app = FastAPI()
@@ -85,13 +85,12 @@ def generate_explanation(monthly_amount, years, annual_return, final_amount, tot
     - {tone}
     """
 
-    message = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=150,
-        messages=[{"role": "user", "content": prompt}]
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=1000
     )
-
-    return message.content[0].text
+    return response.choices[0].message.content
 
 
 def generate_tax_explanation(annual_salary, tax_without_saving, tax_with_saving, tax_saved, language):
@@ -123,13 +122,12 @@ def generate_tax_explanation(annual_salary, tax_without_saving, tax_with_saving,
     - {tone}
     """
 
-    message = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=150,
-        messages=[{"role": "user", "content": prompt}]
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=1000
     )
-
-    return message.content[0].text
+    return response.choices[0].message.content
 
 
 @app.get("/")
@@ -230,12 +228,12 @@ def study_help(request: StudyRequest):
     )
 
     try:
-        message = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=1000,
-            messages=[{"role": "user", "content": prompt}]
+        message = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=1000
         )
-        raw = message.content[0].text.strip()
+        raw = message.choices[0].message.content.strip()
         if raw.startswith("```"):
             raw = raw.replace("```json", "").replace("```", "").strip()
         import json
