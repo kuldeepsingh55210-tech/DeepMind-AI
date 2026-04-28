@@ -14,6 +14,7 @@ from language_detector import detect_language
 from sip import calculate_sip
 from tax_advisor import calculate_tax_savings
 from investment_advisor import get_investment_advice
+from study_engine import get_study_prompt
 
 # Anthropic API client
 client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
@@ -46,6 +47,12 @@ class TaxRequest(BaseModel):
 
 class InvestRequest(BaseModel):
     amount: float
+    query: str = ""
+
+class StudyRequest(BaseModel):
+    exam: str
+    subject: str
+    question: str
     query: str = ""
 
 def generate_explanation(monthly_amount, years, annual_return, final_amount, total_invested, wealth_created, language):
@@ -207,3 +214,51 @@ def invest_advice(request: InvestRequest):
         language=language
     )
     return result
+
+@app.post("/study")
+def study_help(request: StudyRequest):
+    if not request.question or not request.exam or not request.subject:
+        return {"error": "Please provide exam, subject and question"}
+
+    language = detect_language(request.query or request.question)
+
+    prompt = get_study_prompt(
+        exam=request.exam,
+        subject=request.subject,
+        question=request.question,
+        language=language
+    )
+
+    try:
+        message = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=1000,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        raw = message.content[0].text.strip()
+        if raw.startswith("```"):
+            raw = raw.replace("```json", "").replace("```", "").strip()
+        import json
+        result = json.loads(raw)
+    except Exception as e:
+        result = {
+            "explanation": "System is processing your question. Please try again.",
+            "example": "",
+            "exam_tip": "Keep practicing regularly.",
+            "difficulty": "Medium",
+            "related_topics": [],
+            "quick_summary": "Please try again."
+        }
+
+    return {
+        "exam": request.exam,
+        "subject": request.subject,
+        "question": request.question,
+        "language": language,
+        "explanation": result.get("explanation", ""),
+        "example": result.get("example", ""),
+        "exam_tip": result.get("exam_tip", ""),
+        "difficulty": result.get("difficulty", "Medium"),
+        "related_topics": result.get("related_topics", []),
+        "quick_summary": result.get("quick_summary", "")
+    }

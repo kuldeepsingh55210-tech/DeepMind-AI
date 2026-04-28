@@ -1,698 +1,967 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finance AI</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --primary: #2563eb;
-      --primary-light: #eff6ff;
-      --success: #16a34a;
-      --success-light: #f0fdf4;
-      --warning: #d97706;
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --border: #e2e8f0;
-      --text: #0f172a;
-      --muted: #64748b;
-      --radius: 16px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TriMind AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface2: #242424;
+  --border: #2a2a2a;
+  --border2: #333;
+  --text: #f0f0f0;
+  --muted: #888;
+  --dim: #555;
+  --accent: #7c6aff;
+  --accent2: #a78bfa;
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --blue: #3b82f6;
+  --radius: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── LAYOUT ── */
+.app { display: flex; min-height: 100vh; }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding: 24px 16px 60px;
-    }
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 240px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 100;
+}
+.sidebar-logo {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.logo-text {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #7c6aff, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+.logo-sub {
+  font-size: 11px;
+  color: var(--dim);
+  margin-top: 2px;
+}
+.sidebar-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--dim);
+  padding: 0 20px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+  text-align: left;
+  border-radius: 0;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+}
+.mode-btn:hover { background: var(--surface2); color: var(--text); }
+.mode-btn.active {
+  background: rgba(124,106,255,0.1);
+  color: var(--accent2);
+  border-left-color: var(--accent);
+}
+.mode-icon { font-size: 16px; width: 20px; text-align: center; }
+.new-chat-btn {
+  margin: 16px;
+  padding: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.15s;
+}
+.new-chat-btn:hover { background: var(--border2); }
 
-    .container { max-width: 720px; margin: 0 auto; }
+/* ── MAIN ── */
+.main {
+  margin-left: 240px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-    .header {
-      text-align: center;
-      padding: 40px 0 32px;
-    }
+/* ── HERO (shown before first query) ── */
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+}
+.hero-title {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #fff, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 40px;
+}
+.mode-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+.mode-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+.mode-chip:hover { border-color: var(--accent); color: var(--text); }
+.mode-chip.active {
+  background: rgba(124,106,255,0.15);
+  border-color: var(--accent);
+  color: var(--accent2);
+}
 
-    .header h1 {
-      font-size: 32px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-    }
+/* ── SEARCH BOX ── */
+.search-wrap {
+  width: 100%;
+  max-width: 680px;
+  position: relative;
+}
+.search-box {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 16px 56px 16px 20px;
+  font-size: 15px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s;
+  min-height: 56px;
+  max-height: 200px;
+  line-height: 1.5;
+}
+.search-box:focus { border-color: var(--accent); }
+.search-box::placeholder { color: var(--dim); }
+.send-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  font-size: 14px;
+  color: white;
+}
+.send-btn:hover { background: var(--accent2); }
+.search-hint {
+  font-size: 12px;
+  color: var(--dim);
+  margin-top: 10px;
+  text-align: center;
+}
 
-    .header p {
-      color: var(--muted);
-      font-size: 15px;
-    }
+/* ── ANSWER AREA ── */
+.answer-area {
+  display: none;
+  flex: 1;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px 120px;
+}
+.question-display {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  margin-bottom: 24px;
+  color: var(--text);
+  line-height: 1.4;
+}
+.answer-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.meta-tag {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--surface2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.meta-tag.accent {
+  background: rgba(124,106,255,0.15);
+  color: var(--accent2);
+  border-color: rgba(124,106,255,0.3);
+}
 
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      padding: 24px;
-      margin-bottom: 20px;
-    }
+/* ── ANSWER SECTIONS ── */
+.answer-section {
+  margin-bottom: 20px;
+  animation: fadeUp 0.3s ease;
+}
+.section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--dim);
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.answer-text {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #d4d4d4;
+}
+.answer-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+}
+.tip-box {
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.2);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-size: 14px;
+  color: #86efac;
+  line-height: 1.7;
+}
+.tip-box::before { content: "💡 "; }
+.example-box {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  font-size: 13.5px;
+  color: #c4c4c4;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  font-family: 'Inter', monospace;
+}
+.tags-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.topic-tag {
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-size: 12px;
+  background: var(--surface2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.topic-tag:hover { border-color: var(--accent); color: var(--accent2); }
 
-    .card-title {
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--muted);
-      margin-bottom: 16px;
-    }
+/* ── STAT CARDS ── */
+.stats-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.stat-box {
+  flex: 1;
+  min-width: 120px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+}
+.stat-num {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent2);
+  margin-bottom: 4px;
+}
+.stat-num.green { color: var(--green); }
+.stat-num.amber { color: var(--amber); }
+.stat-label {
+  font-size: 11px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-    input, select {
-      display: block;
-      width: 100%;
-      padding: 12px 16px;
-      margin-bottom: 12px;
-      font-size: 15px;
-      font-family: 'Inter', sans-serif;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      outline: none;
-      background: #fafafa;
-      transition: border-color 0.2s;
-    }
+/* ── ALLOCATION BARS ── */
+.alloc-item { margin-bottom: 16px; }
+.alloc-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.alloc-name { font-size: 14px; font-weight: 500; color: var(--text); }
+.alloc-amount { font-size: 14px; font-weight: 600; color: var(--accent2); }
+.alloc-bar-bg {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.alloc-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+.alloc-meta { font-size: 12px; color: var(--dim); }
 
-    input:focus, select:focus {
-      border-color: var(--primary);
-      background: white;
-    }
+/* ── ACTION STEPS ── */
+.step-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.step-item:last-child { border-bottom: none; }
+.step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-text { font-size: 14px; color: #c4c4c4; line-height: 1.6; padding-top: 2px; }
 
-    button {
-      display: block;
-      width: 100%;
-      padding: 13px;
-      font-size: 14px;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform 0.15s, opacity 0.15s;
-    }
+/* ── BOTTOM SEARCH (shown after first query) ── */
+.bottom-search {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 240px;
+  right: 0;
+  padding: 16px 24px 20px;
+  background: linear-gradient(transparent, var(--bg) 30%);
+  z-index: 50;
+}
+.bottom-search-inner {
+  max-width: 680px;
+  margin: 0 auto;
+  position: relative;
+}
 
-    button:hover { transform: translateY(-1px); opacity: 0.92; }
-    button:active { transform: translateY(0); }
-    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+/* ── LOADING ── */
+.loading-wrap {
+  display: none;
+  padding: 32px 0;
+}
+.loading-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.loading-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: bounce 1.2s infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+.loading-label {
+  font-size: 14px;
+  color: var(--muted);
+  margin-left: 10px;
+}
+@keyframes bounce {
+  0%,60%,100%{transform:translateY(0)}
+  30%{transform:translateY(-6px)}
+}
+@keyframes fadeUp {
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
 
-    .btn-primary {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: white;
-    }
+/* ── ERROR ── */
+.error-box {
+  display: none;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #f87171;
+  margin-bottom: 16px;
+}
 
-    .btn-secondary {
-      background: linear-gradient(135deg, #7c3aed, #6d28d9);
-      color: white;
-    }
+/* ── CHART ── */
+.chart-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }
+/* ── DIFFICULTY BADGE ── */
+.diff-easy { color: var(--green); }
+.diff-medium { color: var(--amber); }
+.diff-hard { color: #f87171; }
 
-    .stat-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px 16px;
-      text-align: center;
-      box-shadow: var(--shadow);
-    }
-
-    .stat-card .number {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 4px;
-      letter-spacing: -0.5px;
-    }
-
-    .stat-card .label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--muted);
-    }
-
-    .stat-card.highlight {
-      background: var(--success-light);
-      border-color: #bbf7d0;
-    }
-
-    .stat-card.highlight .number { color: var(--success); }
-
-    #explanation {
-      background: var(--primary-light);
-      border-left: 4px solid var(--primary);
-      border-radius: 0 12px 12px 0;
-      padding: 16px 20px;
-      font-size: 15px;
-      line-height: 1.75;
-      color: #1e40af;
-      margin-bottom: 20px;
-      font-weight: 500;
-    }
-
-    .chart-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      margin-bottom: 20px;
-    }
-
-    .section-divider {
-      border: none;
-      border-top: 2px dashed var(--border);
-      margin: 36px 0;
-    }
-
-    #loading, #tax_loading, #invest_loading {
-      display: none;
-      text-align: center;
-      padding: 32px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .spinner {
-      width: 28px;
-      height: 28px;
-      border: 3px solid var(--border);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin: 0 auto 12px;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    #error, #tax_error, #invest_error {
-      display: none;
-      background: #fef2f2;
-      color: #dc2626;
-      border: 1px solid #fecaca;
-      padding: 14px 16px;
-      border-radius: 10px;
-      margin-bottom: 16px;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    #results, #tax_results, #invest_results {
-      display: none;
-      animation: fadeUp 0.4s ease;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .alloc-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s;
-    }
-
-    .alloc-card:hover { transform: translateY(-2px); }
-
-    .step-card {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-bottom: 10px;
-      box-shadow: var(--shadow);
-    }
-
-    .step-card:first-child {
-      background: var(--primary-light);
-      border-color: #bfdbfe;
-    }
-
-    .step-num {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .summary-box {
-      background: linear-gradient(135deg, #eff6ff, #f0fdf4);
-      border: 1px solid #bfdbfe;
-      border-radius: 14px;
-      padding: 18px 20px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #1e40af;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    @media (max-width: 600px) {
-      .stats-grid { grid-template-columns: 1fr; }
-      .header h1 { font-size: 26px; }
-    }
-  </style>
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .bottom-search { left: 0; }
+  .hero-title { font-size: 26px; }
+}
+</style>
 </head>
 <body>
+<div class="app">
 
-  <div class="container">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">TriMind AI</div>
+    <div class="logo-sub">India's Smart Answer Engine</div>
+  </div>
+  <button class="new-chat-btn" onclick="newChat()">+ New Chat</button>
+  <div class="sidebar-label">Modes</div>
+  <button class="mode-btn active" onclick="selectMode('finance')" id="sb-finance">
+    <span class="mode-icon">💰</span> Finance
+  </button>
+  <button class="mode-btn" onclick="selectMode('study')" id="sb-study">
+    <span class="mode-icon">📚</span> Study
+  </button>
+  <button class="mode-btn" onclick="selectMode('legal')" id="sb-legal">
+    <span class="mode-icon">⚖️</span> Legal
+    <span style="font-size:10px; background:#333; padding:1px 6px; border-radius:4px; margin-left:auto;">Soon</span>
+  </button>
+</aside>
 
-    <!-- HEADER -->
-    <div class="header">
-      <h1>Finance AI</h1>
-      <p>Smart decisions, not just numbers</p>
-    </div>
+<!-- MAIN -->
+<main class="main">
 
-    <!-- SIP INPUT CARD -->
-    <div class="card">
-      <div class="card-title">SIP Projection</div>
-      <input type="number" id="monthly_amount" placeholder="Monthly Investment (&#8377;)" min="1" />
-      <input type="number" id="years" placeholder="Number of Years" min="1" max="40" />
-      <label style="font-size:12px; color:var(--muted); margin-bottom:6px; display:block; font-weight:500;">Expected Return Rate</label>
-      <select id="annual_return">
-        <option value="8">8% &mdash; Conservative (FD level)</option>
-        <option value="10">10% &mdash; Moderate</option>
-        <option value="12" selected>12% &mdash; Standard (Mutual Fund)</option>
-        <option value="15">15% &mdash; Aggressive (Small Cap)</option>
-      </select>
-      <input type="text" id="query" placeholder="Optional: Type your question (Hindi or English)..." />
-      <button class="btn-primary" id="calculateBtn" onclick="calculate()">Calculate SIP Growth</button>
-    </div>
+  <!-- HERO -->
+  <div class="hero" id="hero-section">
+    <div class="hero-title">What do you want to know?</div>
+    <div class="hero-sub">Smart answers for Finance, Study, and more</div>
 
-    <!-- SIP LOADING -->
-    <div id="loading">
-      <div class="spinner"></div>
-      Calculating your projection...
-    </div>
-
-    <div id="error"></div>
-
-    <!-- SIP RESULTS -->
-    <div id="results">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="number" id="stat_final">-</div>
-          <div class="label">Final Amount</div>
-        </div>
-        <div class="stat-card">
-          <div class="number" id="stat_invested">-</div>
-          <div class="label">Total Invested</div>
-        </div>
-        <div class="stat-card highlight">
-          <div class="number" id="stat_earned">-</div>
-          <div class="label">Extra Earned</div>
-        </div>
+    <div class="mode-chips">
+      <div class="mode-chip active" onclick="selectMode('finance')" id="chip-finance">
+        💰 Finance
       </div>
-      <div id="explanation"></div>
-      <div class="chart-box">
-        <div class="card-title">Year-wise Growth</div>
-        <canvas id="sipChart"></canvas>
+      <div class="mode-chip" onclick="selectMode('study')" id="chip-study">
+        📚 Study
+      </div>
+      <div class="mode-chip" onclick="selectMode('legal')" id="chip-legal">
+        ⚖️ Legal (Soon)
       </div>
     </div>
 
-    <hr class="section-divider">
-
-    <!-- TAX INPUT CARD -->
-    <div class="card">
-      <div class="card-title">Tax Saving Calculator</div>
-      <input type="number" id="annual_salary" placeholder="Annual Salary (&#8377;)" min="1" />
-      <input type="text" id="tax_query" placeholder="Optional: Type your question..." />
-      <button class="btn-primary" onclick="calculateTax()">Calculate Tax Saving</button>
+    <!-- Finance sub-options -->
+    <div id="finance-options" style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:24px;">
+      <div class="topic-tag" onclick="fillQuery('Mere paas ₹10,000 hain kahan invest karun?')">₹10K kahan lagaun?</div>
+      <div class="topic-tag" onclick="fillQuery('₹5000 monthly SIP 10 saal mein kitna hoga?')">SIP calculator</div>
+      <div class="topic-tag" onclick="fillQuery('Meri salary ₹8 lakh hai, tax kaise bachau?')">Tax saving</div>
+      <div class="topic-tag" onclick="fillQuery('₹50,000 ka best investment plan kya hai?')">Investment plan</div>
     </div>
 
-    <div id="tax_loading">
-      <div class="spinner"></div>
-      Calculating your tax saving...
+    <!-- Study sub-options -->
+    <div id="study-options" style="display:none; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:24px;">
+      <div class="topic-tag" onclick="fillQuery('Newton ka 2nd law JEE ke liye explain karo with numerical')">Newton JEE</div>
+      <div class="topic-tag" onclick="fillQuery('Mitosis aur Meiosis ka difference NEET ke liye')">Mitosis NEET</div>
+      <div class="topic-tag" onclick="fillQuery('Photoelectric effect Class 12 board ke liye')">Photoelectric Board 12</div>
+      <div class="topic-tag" onclick="fillQuery('French Revolution Class 10 important points')">French Revolution</div>
     </div>
 
-    <div id="tax_error"></div>
-
-    <div id="tax_results">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="number" id="tax_before">-</div>
-          <div class="label">Tax Without Saving</div>
-        </div>
-        <div class="stat-card">
-          <div class="number" id="tax_after">-</div>
-          <div class="label">Tax After 80C</div>
-        </div>
-        <div class="stat-card highlight">
-          <div class="number" id="tax_saved_display">-</div>
-          <div class="label">Total Tax Saved</div>
-        </div>
-      </div>
-      <div id="tax_explanation" style="background:var(--primary-light); border-left:4px solid var(--primary); border-radius:0 12px 12px 0; padding:16px 20px; font-size:15px; line-height:1.75; color:#1e40af; margin-bottom:20px; font-weight:500;"></div>
-      <div class="chart-box">
-        <div class="card-title">Best 80C Options</div>
-        <div id="tax_options"></div>
-      </div>
+    <div class="search-wrap">
+      <textarea class="search-box" id="main-input" rows="1"
+        placeholder="Ask anything... (Hindi, Hinglish or English)"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"></textarea>
+      <button class="send-btn" onclick="submitQuery()">↑</button>
     </div>
-
-    <hr class="section-divider">
-
-    <!-- INVEST INPUT CARD -->
-    <div class="card">
-      <div class="card-title">Investment Advisor</div>
-      <input type="number" id="invest_amount" placeholder="How much do you want to invest? (&#8377;)" min="500" />
-      <input type="text" id="invest_query" placeholder="Optional: Type your question..." />
-      <button class="btn-secondary" onclick="getInvestmentAdvice()">Get Investment Plan</button>
-    </div>
-
-    <div id="invest_loading">
-      <div class="spinner"></div>
-      Building your investment plan...
-    </div>
-
-    <div id="invest_error"></div>
-
-    <div id="invest_results">
-      <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
-        <div class="stat-card">
-          <div class="number" id="invest_amount_display">-</div>
-          <div class="label">Total Amount</div>
-        </div>
-        <div class="stat-card">
-          <div class="number" id="invest_risk" style="font-size:17px; text-transform:capitalize;">-</div>
-          <div class="label">Risk Profile</div>
-        </div>
-      </div>
-      <div id="invest_explanation" style="background:var(--primary-light); border-left:4px solid var(--primary); border-radius:0 12px 12px 0; padding:16px 20px; font-size:15px; line-height:1.75; color:#1e40af; margin-bottom:20px; font-weight:500;"></div>
-      <div class="chart-box" style="margin-bottom:20px;">
-        <div class="card-title">Your Investment Allocation</div>
-        <div id="invest_allocation"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Action Steps</div>
-        <div id="invest_steps"></div>
-      </div>
-    </div>
-
+    <div class="search-hint" id="search-hint">Finance mode active — ask about investments, SIP, tax</div>
   </div>
 
-  <script>
-    const API_URL = window.location.origin + "/sip";
-    let chartInstance = null;
+  <!-- ANSWER AREA -->
+  <div class="answer-area" id="answer-area">
+    <div class="question-display" id="q-display"></div>
+    <div class="answer-meta" id="answer-meta"></div>
+    <div class="error-box" id="error-box"></div>
+    <div class="loading-wrap" id="loading-wrap">
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+        <span class="loading-label" id="loading-label">Soch raha hoon...</span>
+      </div>
+    </div>
+    <div id="answer-content"></div>
+  </div>
 
-    function formatINR(number) {
-      return "₹" + number.toLocaleString("en-IN");
+  <!-- BOTTOM SEARCH (after first query) -->
+  <div class="bottom-search" id="bottom-search">
+    <div class="bottom-search-inner">
+      <textarea class="search-box" id="bottom-input" rows="1"
+        placeholder="Ask a follow-up question..."
+        onkeydown="handleKeyBottom(event)"
+        oninput="autoResize(this)"></textarea>
+      <button class="send-btn" onclick="submitQueryBottom()">↑</button>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// ── STATE ──
+let currentMode = 'finance';
+let chartInstance = null;
+
+// ── HELPERS ──
+function formatINR(n) {
+  if (!n && n !== 0) return '—';
+  if (n >= 10000000) return '₹' + (n/10000000).toFixed(1) + 'Cr';
+  if (n >= 100000) return '₹' + (n/100000).toFixed(1) + 'L';
+  if (n >= 1000) return '₹' + (n/1000).toFixed(0) + 'K';
+  return '₹' + Math.round(n).toLocaleString('en-IN');
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitQuery(); }
+}
+function handleKeyBottom(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitQueryBottom(); }
+}
+
+function fillQuery(text) {
+  document.getElementById('main-input').value = text;
+  autoResize(document.getElementById('main-input'));
+  document.getElementById('main-input').focus();
+}
+
+function newChat() {
+  document.getElementById('hero-section').style.display = 'flex';
+  document.getElementById('answer-area').style.display = 'none';
+  document.getElementById('bottom-search').style.display = 'none';
+  document.getElementById('main-input').value = '';
+  document.getElementById('answer-content').innerHTML = '';
+}
+
+// ── MODE SELECTION ──
+function selectMode(mode) {
+  currentMode = mode;
+
+  // Update sidebar
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  const sb = document.getElementById('sb-' + mode);
+  if (sb) sb.classList.add('active');
+
+  // Update chips
+  document.querySelectorAll('.mode-chip').forEach(c => c.classList.remove('active'));
+  const chip = document.getElementById('chip-' + mode);
+  if (chip) chip.classList.add('active');
+
+  // Show/hide sub-options
+  document.getElementById('finance-options').style.display = mode === 'finance' ? 'flex' : 'none';
+  document.getElementById('study-options').style.display = mode === 'study' ? 'flex' : 'none';
+
+  // Update hint
+  const hints = {
+    finance: 'Finance mode — ask about investments, SIP, tax',
+    study: 'Study mode — ask JEE, NEET, Board questions',
+    legal: 'Legal mode coming soon...'
+  };
+  document.getElementById('search-hint').textContent = hints[mode] || '';
+  document.getElementById('main-input').focus();
+}
+
+// ── SUBMIT ──
+function submitQuery() {
+  const q = document.getElementById('main-input').value.trim();
+  if (!q) return;
+  runQuery(q);
+}
+function submitQueryBottom() {
+  const q = document.getElementById('bottom-input').value.trim();
+  if (!q) return;
+  document.getElementById('bottom-input').value = '';
+  runQuery(q);
+}
+
+// ── DETECT INTENT FROM QUERY ──
+function detectIntent(query) {
+  const q = query.toLowerCase();
+  if (q.includes('sip') || q.includes('invest') || q.includes('lagaun') ||
+      q.includes('tax') || q.includes('salary') || q.includes('mutual') ||
+      q.includes('fd') || q.includes('paisa') || q.includes('₹') ||
+      q.includes('rs ') || q.includes('rupee') || q.includes('fund')) {
+    if (q.includes('sip') || q.includes('mahine') || q.includes('monthly') || q.includes('saal mein kitna')) return 'sip';
+    if (q.includes('tax') || q.includes('80c') || q.includes('itr') || q.includes('salary')) return 'tax';
+    return 'invest';
+  }
+  return 'study';
+}
+
+// ── MAIN QUERY RUNNER ──
+async function runQuery(query) {
+  // Switch to answer view
+  document.getElementById('hero-section').style.display = 'none';
+  document.getElementById('answer-area').style.display = 'block';
+  document.getElementById('bottom-search').style.display = 'block';
+  document.getElementById('q-display').textContent = query;
+  document.getElementById('answer-content').innerHTML = '';
+  document.getElementById('error-box').style.display = 'none';
+  document.getElementById('loading-wrap').style.display = 'block';
+  document.getElementById('answer-meta').innerHTML = '';
+
+  const intent = currentMode === 'finance' ? detectIntent(query) : 'study';
+  document.getElementById('loading-label').textContent =
+    intent === 'study' ? 'Answer dhundh raha hoon...' : 'Calculate kar raha hoon...';
+
+  try {
+    let data;
+    if (currentMode === 'study') {
+      // Parse exam from query
+      let exam = 'Board 12';
+      if (query.toLowerCase().includes('jee')) exam = 'JEE';
+      else if (query.toLowerCase().includes('neet')) exam = 'NEET';
+      else if (query.toLowerCase().includes('class 10') || query.toLowerCase().includes('board 10')) exam = 'Board 10';
+
+      let subject = 'Physics';
+      if (query.toLowerCase().includes('chem')) subject = 'Chemistry';
+      else if (query.toLowerCase().includes('bio') || query.toLowerCase().includes('mitosis')) subject = 'Biology';
+      else if (query.toLowerCase().includes('math') || query.toLowerCase().includes('calculus')) subject = 'Mathematics';
+      else if (query.toLowerCase().includes('history') || query.toLowerCase().includes('french')) subject = 'History';
+      else if (query.toLowerCase().includes('geo')) subject = 'Geography';
+
+      const res = await fetch(window.location.origin + '/study', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ exam, subject, question: query, query })
+      });
+      data = await res.json();
+      data._type = 'study';
+      data._exam = exam;
+      data._subject = subject;
+
+    } else if (intent === 'sip') {
+      const nums = query.match(/\d+/g) || [];
+      const amount = nums[0] ? parseFloat(nums[0]) : 5000;
+      const years = nums[1] ? parseInt(nums[1]) : 5;
+      const res = await fetch(window.location.origin + '/sip', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ monthly_amount: amount, years, annual_return: 12, query })
+      });
+      data = await res.json();
+      data._type = 'sip';
+      data._amount = amount;
+      data._years = years;
+
+    } else if (intent === 'tax') {
+      const nums = query.match(/\d+/g) || [];
+      const salary = nums[0] ? parseFloat(nums[0]) : 800000;
+      const finalSalary = salary < 10000 ? salary * 100000 : salary < 1000 ? salary * 100000 : salary;
+      const res = await fetch(window.location.origin + '/tax', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ annual_salary: finalSalary, query })
+      });
+      data = await res.json();
+      data._type = 'tax';
+
+    } else {
+      const nums = query.match(/\d+/g) || [];
+      const amount = nums[0] ? parseFloat(nums[0]) : 10000;
+      const finalAmount = amount < 1000 ? amount * 1000 : amount;
+      const res = await fetch(window.location.origin + '/invest', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ amount: finalAmount, query })
+      });
+      data = await res.json();
+      data._type = 'invest';
     }
 
-    async function calculate() {
-      const monthly_amount = parseFloat(document.getElementById("monthly_amount").value);
-      const years = parseInt(document.getElementById("years").value);
-      const query = document.getElementById("query").value.trim();
-      const annual_return = parseFloat(document.getElementById("annual_return").value);
+    document.getElementById('loading-wrap').style.display = 'none';
+    renderAnswer(data, intent);
 
-      if (!monthly_amount || !years) {
-        showError("Please enter both Monthly Amount and Years.");
-        return;
-      }
+  } catch (err) {
+    document.getElementById('loading-wrap').style.display = 'none';
+    document.getElementById('error-box').textContent = 'Server se connect nahi ho pa raha. Backend chal raha hai?';
+    document.getElementById('error-box').style.display = 'block';
+  }
+}
 
-      if (monthly_amount <= 0 || years <= 0) {
-        showError("Values must be greater than zero.");
-        return;
-      }
+// ── RENDER ANSWER ──
+function renderAnswer(data, intent) {
+  const area = document.getElementById('answer-content');
+  const meta = document.getElementById('answer-meta');
+  area.innerHTML = '';
 
-      document.getElementById("loading").style.display = "block";
-      document.getElementById("results").style.display = "none";
-      document.getElementById("error").style.display = "none";
-      document.getElementById("calculateBtn").disabled = true;
+  const type = data._type;
 
-      try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ monthly_amount, years, annual_return, query })
-        });
+  // ── STUDY ANSWER ──
+  if (type === 'study') {
+    const diffClass = data.difficulty === 'Easy' ? 'diff-easy' : data.difficulty === 'Hard' ? 'diff-hard' : 'diff-medium';
+    meta.innerHTML = `
+      <span class="meta-tag accent">${data._exam}</span>
+      <span class="meta-tag">${data._subject}</span>
+      <span class="meta-tag ${diffClass}">${data.difficulty}</span>
+      <span class="meta-tag">${data.language === 'hinglish' ? '🇮🇳 Hinglish' : '🇬🇧 English'}</span>
+    `;
+    area.innerHTML = `
+      <div class="answer-section">
+        <div class="section-label">Explanation</div>
+        <div class="answer-text">${data.explanation || 'AI key set karo for detailed explanation'}</div>
+      </div>
+      <div class="answer-section">
+        <div class="section-label">Example / Solution</div>
+        <div class="example-box">${data.example || '—'}</div>
+      </div>
+      <div class="answer-section">
+        <div class="section-label">Exam Tip</div>
+        <div class="tip-box">${data.exam_tip || 'Keep practicing regularly'}</div>
+      </div>
+      <div class="answer-section">
+        <div class="section-label">Related Topics</div>
+        <div class="tags-row">
+          ${(data.related_topics || []).map(t => `<span class="topic-tag" onclick="fillQuery('${t} explain karo')">${t}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  }
 
-        const data = await response.json();
-
-        if (data.error) {
-          showError(data.error);
-          return;
-        }
-
-        const total_invested = monthly_amount * 12 * years;
-        const wealth_created = data.final_amount - total_invested;
-
-        document.getElementById("stat_final").textContent = formatINR(data.final_amount);
-        document.getElementById("stat_invested").textContent = formatINR(total_invested);
-        document.getElementById("stat_earned").textContent = formatINR(wealth_created);
-        document.getElementById("explanation").textContent = data.explanation;
-
-        if (chartInstance) chartInstance.destroy();
-
-        chartInstance = new Chart(document.getElementById("sipChart"), {
-          type: "bar",
-          data: {
-            labels: data.yearly_growth.labels.map(l => "Year " + l),
-            datasets: [{
-              label: "Portfolio Value",
-              data: data.yearly_growth.values,
-              backgroundColor: "#2563eb",
-              borderRadius: 6,
-              borderSkipped: false
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: ctx => formatINR(ctx.raw)
-                }
-              }
-            },
-            scales: {
-              y: {
-                ticks: {
-                  callback: value => formatINR(value)
-                },
-                grid: { color: "#f3f4f6" }
-              },
-              x: {
-                grid: { display: false }
-              }
-            }
+  // ── SIP ANSWER ──
+  else if (type === 'sip') {
+    meta.innerHTML = `
+      <span class="meta-tag accent">SIP Calculator</span>
+      <span class="meta-tag">${data._amount ? formatINR(data._amount) + '/month' : ''}</span>
+      <span class="meta-tag">${data._years} years</span>
+    `;
+    const total = data._amount * 12 * data._years;
+    const earned = data.final_amount - total;
+    area.innerHTML = `
+      <div class="answer-section">
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-num">${formatINR(data.final_amount)}</div>
+            <div class="stat-label">Final Amount</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">${formatINR(total)}</div>
+            <div class="stat-label">Invested</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num green">${formatINR(earned)}</div>
+            <div class="stat-label">Extra Earned</div>
+          </div>
+        </div>
+      </div>
+      <div class="answer-section">
+        <div class="section-label">Explanation</div>
+        <div class="answer-text">${data.explanation}</div>
+      </div>
+      <div class="answer-section">
+        <div class="section-label">Year-wise Growth</div>
+        <div class="chart-wrap"><canvas id="sipChart"></canvas></div>
+      </div>
+    `;
+    setTimeout(() => {
+      if (chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(document.getElementById('sipChart'), {
+        type: 'bar',
+        data: {
+          labels: data.yearly_growth.labels.map(l => 'Y' + l),
+          datasets: [{
+            label: 'Value',
+            data: data.yearly_growth.values,
+            backgroundColor: '#7c6aff',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { callback: v => formatINR(v), color: '#888' }, grid: { color: '#2a2a2a' } },
+            x: { ticks: { color: '#888' }, grid: { display: false } }
           }
-        });
-
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("results").style.display = "block";
-
-      } catch (err) {
-        showError("Cannot connect to server. Make sure backend is running on port 8000.");
-      } finally {
-        document.getElementById("calculateBtn").disabled = false;
-      }
-    }
-
-    function showError(message) {
-      document.getElementById("loading").style.display = "none";
-      document.getElementById("error").textContent = message;
-      document.getElementById("error").style.display = "block";
-      document.getElementById("calculateBtn").disabled = false;
-    }
-
-    function showTaxError(message) {
-      document.getElementById("tax_loading").style.display = "none";
-      document.getElementById("tax_error").textContent = message;
-      document.getElementById("tax_error").style.display = "block";
-    }
-
-    async function calculateTax() {
-      const annual_salary = parseFloat(document.getElementById("annual_salary").value);
-      const query = document.getElementById("tax_query").value.trim();
-
-      if (!annual_salary || annual_salary <= 0) {
-        showTaxError("Please enter a valid Annual Salary.");
-        return;
-      }
-
-      document.getElementById("tax_loading").style.display = "block";
-      document.getElementById("tax_results").style.display = "none";
-      document.getElementById("tax_error").style.display = "none";
-
-      try {
-        const response = await fetch(window.location.origin + "/tax", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ annual_salary, query })
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-          showTaxError(data.error);
-          return;
         }
+      });
+    }, 100);
+  }
 
-        document.getElementById("tax_before").textContent = formatINR(data.tax_without_saving);
-        document.getElementById("tax_after").textContent = formatINR(data.tax_with_saving);
-        document.getElementById("tax_saved_display").textContent = formatINR(data.tax_saved);
-        document.getElementById("tax_explanation").textContent = data.explanation;
-
-        const optionsContainer = document.getElementById("tax_options");
-        optionsContainer.innerHTML = "";
-        data.options.forEach(opt => {
-          const div = document.createElement("div");
-          div.style.cssText = "display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #f3f4f6;";
-          div.innerHTML = `
-            <span style="font-size:18px;">${opt.recommended ? "⭐" : "✅"}</span>
-            <span style="font-size:14px; color:#374151;">${opt.name}</span>
-            ${opt.recommended ? '<span style="font-size:11px; background:#dcfce7; color:#16a34a; padding:2px 8px; border-radius:20px; font-weight:600;">Recommended</span>' : ""}
-          `;
-          optionsContainer.appendChild(div);
-        });
-
-        document.getElementById("tax_loading").style.display = "none";
-        document.getElementById("tax_results").style.display = "block";
-
-      } catch (err) {
-        showTaxError("Cannot connect to server. Make sure backend is running on port 8000.");
-      }
-    }
-
-    async function getInvestmentAdvice() {
-      const amount = parseFloat(
-        document.getElementById("invest_amount").value
-      );
-      const query = document.getElementById("invest_query").value.trim();
-
-      if (!amount || amount < 500) {
-        document.getElementById("invest_error").textContent =
-          "Please enter a valid amount (minimum \u20b9500).";
-        document.getElementById("invest_error").style.display = "block";
-        return;
-      }
-
-      document.getElementById("invest_loading").style.display = "block";
-      document.getElementById("invest_results").style.display = "none";
-      document.getElementById("invest_error").style.display = "none";
-
-      try {
-        const response = await fetch(window.location.origin + "/invest", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount, query })
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-          document.getElementById("invest_error").textContent = data.error;
-          document.getElementById("invest_error").style.display = "block";
-          document.getElementById("invest_loading").style.display = "none";
-          return;
-        }
-
-        document.getElementById("invest_amount_display").textContent =
-          formatINR(data.amount);
-        document.getElementById("invest_risk").textContent =
-          data.risk_level.charAt(0).toUpperCase() + data.risk_level.slice(1);
-
-        const explanationText = data.explanation || data.summary || "";
-        document.getElementById("invest_explanation").textContent =
-          explanationText;
-
-        const colors = {
-          "Fixed Deposit":   "#2563eb",
-          "Mutual Fund SIP": "#16a34a",
-          "Digital Gold":    "#d97706",
-          "Savings Account": "#7c3aed",
-          "PPF Account":     "#0891b2"
-        };
-
-        document.getElementById("invest_allocation").innerHTML =
-          data.allocation.map(item => `
-            <div style="margin-bottom:14px;">
-              <div style="display:flex; justify-content:space-between;
-                margin-bottom:4px;">
-                <span style="font-size:14px; font-weight:600; color:#1a1a2e;">
-                  ${item.category}
-                </span>
-                <span style="font-size:14px; font-weight:700;
-                  color:${colors[item.category] || '#2563eb'};">
-                  ${formatINR(item.amount)} (${item.percentage}%)
-                </span>
-              </div>
-              <div style="background:#f1f5f9; border-radius:4px;
-                height:8px; margin-bottom:4px;">
-                <div style="width:${item.percentage}%; height:8px;
-                  background:${colors[item.category] || '#2563eb'};
-                  border-radius:4px;">
-                </div>
-              </div>
-              <div style="font-size:12px; color:#6b7280;">
-                ${item.reason} &mdash; <span style="color:#2563eb;">${item.action}</span>
-              </div>
+  // ── TAX ANSWER ──
+  else if (type === 'tax') {
+    meta.innerHTML = `<span class="meta-tag accent">Tax Saving</span><span class="meta-tag">Section 80C</span>`;
+    area.innerHTML = `
+      <div class="answer-section">
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-num">${formatINR(data.tax_without_saving)}</div>
+            <div class="stat-label">Tax Without Saving</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">${formatINR(data.tax_with_saving)}</div>
+            <div class="stat-label">Tax After 80C</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num green">${formatINR(data.tax_saved)}</div>
+            <div class="stat-label">Tax Saved</div>
+          </div>
+        </div>
+      </div>
+      <div class="answer-section">
+        <div class="section-label">Explanation</div>
+        <div class="answer-text">${data.explanation}</div>
+      </div>
+      <div class="answer-section">
+        <div class="section-label">Best 80C Options</div>
+        <div class="answer-card">
+          ${(data.options || []).map(o => `
+            <div class="step-item">
+              <span style="font-size:16px;">${o.recommended ? '⭐' : '○'}</span>
+              <div class="step-text">${o.name} ${o.recommended ? '<span style="font-size:11px; background:rgba(34,197,94,0.1); color:#86efac; padding:2px 7px; border-radius:4px; margin-left:6px;">Recommended</span>' : ''}</div>
             </div>
-          `).join('');
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
 
-        document.getElementById("invest_steps").innerHTML =
-          data.action_steps.map((step, i) => `
-            <div style="display:flex; gap:12px; align-items:flex-start;
-              padding:10px 12px; margin-bottom:8px; border-radius:8px;
-              background:${i === 0 ? '#eff6ff' : '#f9fafb'};
-              border:1px solid ${i === 0 ? '#bfdbfe' : '#e5e7eb'};">
-              <span style="background:#2563eb; color:white; width:22px;
-                height:22px; border-radius:50%; display:flex;
-                align-items:center; justify-content:center;
-                font-size:12px; font-weight:700; flex-shrink:0;">
-                ${i + 1}
-              </span>
-              <span style="font-size:14px; color:#374151;">${step}</span>
+  // ── INVEST ANSWER ──
+  else if (type === 'invest') {
+    const colors = { 'Fixed Deposit':'#3b82f6', 'Mutual Fund SIP':'#22c55e', 'Digital Gold':'#f59e0b', 'Savings Account':'#a78bfa', 'PPF Account':'#06b6d4' };
+    meta.innerHTML = `
+      <span class="meta-tag accent">Investment Plan</span>
+      <span class="meta-tag">${formatINR(data.amount)}</span>
+      <span class="meta-tag" style="text-transform:capitalize;">${data.risk_level} Risk</span>
+    `;
+    area.innerHTML = `
+      <div class="answer-section">
+        <div class="section-label">Explanation</div>
+        <div class="answer-text">${data.explanation || data.summary}</div>
+      </div>
+      <div class="answer-section">
+        <div class="section-label">Allocation Plan</div>
+        <div class="answer-card">
+          ${(data.allocation || []).map(a => `
+            <div class="alloc-item">
+              <div class="alloc-header">
+                <span class="alloc-name">${a.category}</span>
+                <span class="alloc-amount">${formatINR(a.amount)} (${a.percentage}%)</span>
+              </div>
+              <div class="alloc-bar-bg">
+                <div class="alloc-bar-fill" style="width:${a.percentage}%; background:${colors[a.category] || '#7c6aff'};"></div>
+              </div>
+              <div class="alloc-meta">${a.reason} — ${a.action}</div>
             </div>
-          `).join('');
-
-        document.getElementById("invest_loading").style.display = "none";
-        document.getElementById("invest_results").style.display = "block";
-
-      } catch (err) {
-        document.getElementById("invest_loading").style.display = "none";
-        document.getElementById("invest_error").textContent =
-          "Cannot connect to server. Make sure backend is running.";
-        document.getElementById("invest_error").style.display = "block";
-      }
-    }
-  </script>
-
+          `).join('')}
+        </div>
+      </div>
+      <div class="answer-section">
+        <div class="section-label">Action Steps</div>
+        <div class="answer-card">
+          ${(data.action_steps || []).map((s, i) => `
+            <div class="step-item">
+              <div class="step-num">${i+1}</div>
+              <div class="step-text">${s}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+}
+</script>
 </body>
 </html>
