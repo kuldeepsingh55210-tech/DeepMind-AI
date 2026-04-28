@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --success: #16a34a;
+      --success-light: #f0fdf4;
+      --warning: #d97706;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --radius: 16px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px 16px 60px;
+    }
+
+    .container { max-width: 720px; margin: 0 auto; }
+
+    .header {
+      text-align: center;
+      padding: 40px 0 32px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    input, select {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      background: #fafafa;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      background: white;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    button:hover { transform: translateY(-1px); opacity: 0.92; }
+    button:active { transform: translateY(0); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: white;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card .number {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+    }
+
+    .stat-card .label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+    }
+
+    .stat-card.highlight {
+      background: var(--success-light);
+      border-color: #bbf7d0;
+    }
+
+    .stat-card.highlight .number { color: var(--success); }
+
+    #explanation {
+      background: var(--primary-light);
+      border-left: 4px solid var(--primary);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 20px;
+      font-size: 15px;
+      line-height: 1.75;
+      color: #1e40af;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .chart-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 2px dashed var(--border);
+      margin: 36px 0;
+    }
+
+    #loading, #tax_loading, #invest_loading {
+      display: none;
+      text-align: center;
+      padding: 32px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #error, #tax_error, #invest_error {
+      display: none;
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    #results, #tax_results, #invest_results {
+      display: none;
+      animation: fadeUp 0.4s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alloc-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s;
+    }
+
+    .alloc-card:hover { transform: translateY(-2px); }
+
+    .step-card {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .step-card:first-child {
+      background: var(--primary-light);
+      border-color: #bfdbfe;
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .summary-box {
+      background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 18px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1e40af;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .header h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+      <h1>Finance AI</h1>
+      <p>Smart decisions, not just numbers</p>
+    </div>
+
+    <!-- SIP INPUT CARD -->
+    <div class="card">
+      <div class="card-title">SIP Projection</div>
+      <input type="number" id="monthly_amount" placeholder="Monthly Investment (&#8377;)" min="1" />
+      <input type="number" id="years" placeholder="Number of Years" min="1" max="40" />
+      <label style="font-size:12px; color:var(--muted); margin-bottom:6px; display:block; font-weight:500;">Expected Return Rate</label>
+      <select id="annual_return">
+        <option value="8">8% &mdash; Conservative (FD level)</option>
+        <option value="10">10% &mdash; Moderate</option>
+        <option value="12" selected>12% &mdash; Standard (Mutual Fund)</option>
+        <option value="15">15% &mdash; Aggressive (Small Cap)</option>
+      </select>
+      <input type="text" id="query" placeholder="Optional: Type your question (Hindi or English)..." />
+      <button class="btn-primary" id="calculateBtn" onclick="calculate()">Calculate SIP Growth</button>
+    </div>
+
+    <!-- SIP LOADING -->
+    <div id="loading">
+      <div class="spinner"></div>
+      Calculating your projection...
+    </div>
+
+    <div id="error"></div>
+
+    <!-- SIP RESULTS -->
+    <div id="results">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="number" id="stat_final">-</div>
+          <div class="label">Final Amount</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="stat_invested">-</div>
+          <div class="label">Total Invested</div>
+        </div>
+        <div class="stat-card highlight">
+          <div class="number" id="stat_earned">-</div>
+          <div class="label">Extra Earned</div>
+        </div>
+      </div>
+      <div id="explanation"></div>
+      <div class="chart-box">
+        <div class="card-title">Year-wise Growth</div>
+        <canvas id="sipChart"></canvas>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- TAX INPUT CARD -->
+    <div class="card">
+      <div class="card-title">Tax Saving Calculator</div>
+      <input type="number" id="annual_salary" placeholder="Annual Salary (&#8377;)" min="1" />
+      <input type="text" id="tax_query" placeholder="Optional: Type your question..." />
+      <button class="btn-primary" onclick="calculateTax()">Calculate Tax Saving</button>
+    </div>
+
+    <div id="tax_loading">
+      <div class="spinner"></div>
+      Calculating your tax saving...
+    </div>
+
+    <div id="tax_error"></div>
+
+    <div id="tax_results">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="number" id="tax_before">-</div>
+          <div class="label">Tax Without Saving</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="tax_after">-</div>
+          <div class="label">Tax After 80C</div>
+        </div>
+        <div class="stat-card highlight">
+          <div class="number" id="tax_saved_display">-</div>
+          <div class="label">Total Tax Saved</div>
+        </div>
+      </div>
+      <div id="tax_explanation" style="background:var(--primary-light); border-left:4px solid var(--primary); border-radius:0 12px 12px 0; padding:16px 20px; font-size:15px; line-height:1.75; color:#1e40af; margin-bottom:20px; font-weight:500;"></div>
+      <div class="chart-box">
+        <div class="card-title">Best 80C Options</div>
+        <div id="tax_options"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- INVEST INPUT CARD -->
+    <div class="card">
+      <div class="card-title">Investment Advisor</div>
+      <input type="number" id="invest_amount" placeholder="How much do you want to invest? (&#8377;)" min="500" />
+      <input type="text" id="invest_query" placeholder="Optional: Type your question..." />
+      <button class="btn-secondary" onclick="getInvestmentAdvice()">Get Investment Plan</button>
+    </div>
+
+    <div id="invest_loading">
+      <div class="spinner"></div>
+      Building your investment plan...
+    </div>
+
+    <div id="invest_error"></div>
+
+    <div id="invest_results">
+      <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="stat-card">
+          <div class="number" id="invest_amount_display">-</div>
+          <div class="label">Total Amount</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="invest_risk" style="font-size:17px; text-transform:capitalize;">-</div>
+          <div class="label">Risk Profile</div>
+        </div>
+      </div>
+      <div id="invest_explanation" style="background:var(--primary-light); border-left:4px solid var(--primary); border-radius:0 12px 12px 0; padding:16px 20px; font-size:15px; line-height:1.75; color:#1e40af; margin-bottom:20px; font-weight:500;"></div>
+      <div class="chart-box" style="margin-bottom:20px;">
+        <div class="card-title">Your Investment Allocation</div>
+        <div id="invest_allocation"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Action Steps</div>
+        <div id="invest_steps"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = window.location.origin + "/sip";
+    let chartInstance = null;
+
+    function formatINR(number) {
+      return "₹" + number.toLocaleString("en-IN");
+    }
+
+    async function calculate() {
+      const monthly_amount = parseFloat(document.getElementById("monthly_amount").value);
+      const years = parseInt(document.getElementById("years").value);
+      const query = document.getElementById("query").value.trim();
+      const annual_return = parseFloat(document.getElementById("annual_return").value);
+
+      if (!monthly_amount || !years) {
+        showError("Please enter both Monthly Amount and Years.");
+        return;
+      }
+
+      if (monthly_amount <= 0 || years <= 0) {
+        showError("Values must be greater than zero.");
+        return;
+      }
+
+      document.getElementById("loading").style.display = "block";
+      document.getElementById("results").style.display = "none";
+      document.getElementById("error").style.display = "none";
+      document.getElementById("calculateBtn").disabled = true;
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ monthly_amount, years, annual_return, query })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          showError(data.error);
+          return;
+        }
+
+        const total_invested = monthly_amount * 12 * years;
+        const wealth_created = data.final_amount - total_invested;
+
+        document.getElementById("stat_final").textContent = formatINR(data.final_amount);
+        document.getElementById("stat_invested").textContent = formatINR(total_invested);
+        document.getElementById("stat_earned").textContent = formatINR(wealth_created);
+        document.getElementById("explanation").textContent = data.explanation;
+
+        if (chartInstance) chartInstance.destroy();
+
+        chartInstance = new Chart(document.getElementById("sipChart"), {
+          type: "bar",
+          data: {
+            labels: data.yearly_growth.labels.map(l => "Year " + l),
+            datasets: [{
+              label: "Portfolio Value",
+              data: data.yearly_growth.values,
+              backgroundColor: "#2563eb",
+              borderRadius: 6,
+              borderSkipped: false
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: ctx => formatINR(ctx.raw)
+                }
+              }
+            },
+            scales: {
+              y: {
+                ticks: {
+                  callback: value => formatINR(value)
+                },
+                grid: { color: "#f3f4f6" }
+              },
+              x: {
+                grid: { display: false }
+              }
+            }
+          }
+        });
+
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("results").style.display = "block";
+
+      } catch (err) {
+        showError("Cannot connect to server. Make sure backend is running on port 8000.");
+      } finally {
+        document.getElementById("calculateBtn").disabled = false;
+      }
+    }
+
+    function showError(message) {
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("error").textContent = message;
+      document.getElementById("error").style.display = "block";
+      document.getElementById("calculateBtn").disabled = false;
+    }
+
+    function showTaxError(message) {
+      document.getElementById("tax_loading").style.display = "none";
+      document.getElementById("tax_error").textContent = message;
+      document.getElementById("tax_error").style.display = "block";
+    }
+
+    async function calculateTax() {
+      const annual_salary = parseFloat(document.getElementById("annual_salary").value);
+      const query = document.getElementById("tax_query").value.trim();
+
+      if (!annual_salary || annual_salary <= 0) {
+        showTaxError("Please enter a valid Annual Salary.");
+        return;
+      }
+
+      document.getElementById("tax_loading").style.display = "block";
+      document.getElementById("tax_results").style.display = "none";
+      document.getElementById("tax_error").style.display = "none";
+
+      try {
+        const response = await fetch(window.location.origin + "/tax", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ annual_salary, query })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          showTaxError(data.error);
+          return;
+        }
+
+        document.getElementById("tax_before").textContent = formatINR(data.tax_without_saving);
+        document.getElementById("tax_after").textContent = formatINR(data.tax_with_saving);
+        document.getElementById("tax_saved_display").textContent = formatINR(data.tax_saved);
+        document.getElementById("tax_explanation").textContent = data.explanation;
+
+        const optionsContainer = document.getElementById("tax_options");
+        optionsContainer.innerHTML = "";
+        data.options.forEach(opt => {
+          const div = document.createElement("div");
+          div.style.cssText = "display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #f3f4f6;";
+          div.innerHTML = `
+            <span style="font-size:18px;">${opt.recommended ? "⭐" : "✅"}</span>
+            <span style="font-size:14px; color:#374151;">${opt.name}</span>
+            ${opt.recommended ? '<span style="font-size:11px; background:#dcfce7; color:#16a34a; padding:2px 8px; border-radius:20px; font-weight:600;">Recommended</span>' : ""}
+          `;
+          optionsContainer.appendChild(div);
+        });
+
+        document.getElementById("tax_loading").style.display = "none";
+        document.getElementById("tax_results").style.display = "block";
+
+      } catch (err) {
+        showTaxError("Cannot connect to server. Make sure backend is running on port 8000.");
+      }
+    }
+
+    async function getInvestmentAdvice() {
+      const amount = parseFloat(
+        document.getElementById("invest_amount").value
+      );
+      const query = document.getElementById("invest_query").value.trim();
+
+      if (!amount || amount < 500) {
+        document.getElementById("invest_error").textContent =
+          "Please enter a valid amount (minimum \u20b9500).";
+        document.getElementById("invest_error").style.display = "block";
+        return;
+      }
+
+      document.getElementById("invest_loading").style.display = "block";
+      document.getElementById("invest_results").style.display = "none";
+      document.getElementById("invest_error").style.display = "none";
+
+      try {
+        const response = await fetch(window.location.origin + "/invest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount, query })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          document.getElementById("invest_error").textContent = data.error;
+          document.getElementById("invest_error").style.display = "block";
+          document.getElementById("invest_loading").style.display = "none";
+          return;
+        }
+
+        document.getElementById("invest_amount_display").textContent =
+          formatINR(data.amount);
+        document.getElementById("invest_risk").textContent =
+          data.risk_level.charAt(0).toUpperCase() + data.risk_level.slice(1);
+
+        const explanationText = data.explanation || data.summary || "";
+        document.getElementById("invest_explanation").textContent =
+          explanationText;
+
+        const colors = {
+          "Fixed Deposit":   "#2563eb",
+          "Mutual Fund SIP": "#16a34a",
+          "Digital Gold":    "#d97706",
+          "Savings Account": "#7c3aed",
+          "PPF Account":     "#0891b2"
+        };
+
+        document.getElementById("invest_allocation").innerHTML =
+          data.allocation.map(item => `
+            <div style="margin-bottom:14px;">
+              <div style="display:flex; justify-content:space-between;
+                margin-bottom:4px;">
+                <span style="font-size:14px; font-weight:600; color:#1a1a2e;">
+                  ${item.category}
+                </span>
+                <span style="font-size:14px; font-weight:700;
+                  color:${colors[item.category] || '#2563eb'};">
+                  ${formatINR(item.amount)} (${item.percentage}%)
+                </span>
+              </div>
+              <div style="background:#f1f5f9; border-radius:4px;
+                height:8px; margin-bottom:4px;">
+                <div style="width:${item.percentage}%; height:8px;
+                  background:${colors[item.category] || '#2563eb'};
+                  border-radius:4px;">
+                </div>
+              </div>
+              <div style="font-size:12px; color:#6b7280;">
+                ${item.reason} &mdash; <span style="color:#2563eb;">${item.action}</span>
+              </div>
+            </div>
+          `).join('');
+
+        document.getElementById("invest_steps").innerHTML =
+          data.action_steps.map((step, i) => `
+            <div style="display:flex; gap:12px; align-items:flex-start;
+              padding:10px 12px; margin-bottom:8px; border-radius:8px;
+              background:${i === 0 ? '#eff6ff' : '#f9fafb'};
+              border:1px solid ${i === 0 ? '#bfdbfe' : '#e5e7eb'};">
+              <span style="background:#2563eb; color:white; width:22px;
+                height:22px; border-radius:50%; display:flex;
+                align-items:center; justify-content:center;
+                font-size:12px; font-weight:700; flex-shrink:0;">
+                ${i + 1}
+              </span>
+              <span style="font-size:14px; color:#374151;">${step}</span>
+            </div>
+          `).join('');
+
+        document.getElementById("invest_loading").style.display = "none";
+        document.getElementById("invest_results").style.display = "block";
+
+      } catch (err) {
+        document.getElementById("invest_loading").style.display = "none";
+        document.getElementById("invest_error").textContent =
+          "Cannot connect to server. Make sure backend is running.";
+        document.getElementById("invest_error").style.display = "block";
+      }
+    }
+  </script>
+
+</body>
+</html>
